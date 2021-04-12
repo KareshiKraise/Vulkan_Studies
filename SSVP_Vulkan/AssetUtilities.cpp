@@ -40,7 +40,7 @@ std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, s
 		{
 			Texture texture;
 			texture.type = typeName;
-			texture.path = str.C_Str();
+			texture.path = directory + "/" + std::string(str.C_Str());//str.C_Str();
 			texture.setupTexture((in_backend));
 			textures.push_back(texture);
 			textures_loaded.push_back(texture);
@@ -126,7 +126,7 @@ static Mesh processModel(aiMesh* mesh, const aiScene* scene, Vulkan_Backend& in_
 	//
 	//std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 	//textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
+		
 	Material diffMat;
 	diffMat.diffuse = &diffuseMaps.front();	
 	return Mesh(vertices, indices, diffMat);

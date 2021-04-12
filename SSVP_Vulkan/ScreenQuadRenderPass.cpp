@@ -9,7 +9,7 @@ using namespace utils;
 
 ScreenQuadRenderPass::ScreenQuadRenderPass(Vulkan_Renderer& renderer) : m_renderer{ renderer }
 {
-	model_path = "models/sponza.obj";
+	model_path = "models/cornell_closed/cornell_closed.obj";
 
 	createSemaphores();
 	createRenderPass();
@@ -21,16 +21,14 @@ ScreenQuadRenderPass::ScreenQuadRenderPass(Vulkan_Renderer& renderer) : m_render
 	createDescriptorPool();
 	createDescriptorSets();
 	createCommandBuffers();
-	//createImageDescriptorLayout();
-	//createDescriptorLayout();
-	
+	createImageDescriptorLayout();
+	createDescriptorLayout();	
 
-	//loadAssets();
+	loadAssets();
 }
 
 ScreenQuadRenderPass::~ScreenQuadRenderPass()
 {
-
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		vkDestroySemaphore(m_renderer.m_backend.m_device, waitImageAvailable[i], nullptr);

@@ -1,6 +1,7 @@
 #include "Primitives.h"
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" 
+#include <iostream>
 #include <stdexcept>
 
 VkVertexInputBindingDescription getBindingDescription() {
@@ -49,6 +50,14 @@ void Texture::setupTexture(Vulkan_Backend& backend)
 	int texWidth, texHeight, texChannels;
 
 	stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+		
+	if (!pixels)
+	{
+		std::cout << "Texture failed to load at path: " << this->path.c_str() << std::endl;
+		std::cout << stbi_failure_reason() << std::endl;
+		stbi_image_free(pixels);
+	}
+
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	VkBuffer stagingBuffer;
@@ -59,17 +68,6 @@ void Texture::setupTexture(Vulkan_Backend& backend)
 		stagingBuffer, stagingBufferMemory);
 
 	void* data;
-	vkMapMemory(backend.m_device, stagingBufferMemory, 0, imageSize, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(backend.m_device, stagingBufferMemory);
-
-	stbi_image_free(pixels);
-
-	createBuffer(backend, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		stagingBuffer, stagingBufferMemory);
-
-	data;
 	vkMapMemory(backend.m_device, stagingBufferMemory, 0, imageSize, 0, &data);
 	memcpy(data, pixels, static_cast<size_t>(imageSize));
 	vkUnmapMemory(backend.m_device, stagingBufferMemory);
@@ -160,4 +158,9 @@ void Material::CreateMaterial(Vulkan_Backend& backend, VkDescriptorPool descript
 	writeDescriptorSets.push_back(writeDescSet);
 
 	vkUpdateDescriptorSets(backend.m_device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
+}
+
+void Mesh::SetupMesh()
+{
+
 }

@@ -48,10 +48,12 @@ VkVertexInputBindingDescription getBindingDescription();
 std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions();
 
 struct Mesh {
-	//Mesh(std::vector<vertex> v, std::vector<uint16_t> i, std::vector<Texture> t){}
+	
 	Mesh(std::vector<vertex> v, std::vector<uint16_t> i, Material m) { vertices = v; indices = i; mat = m; };
 	std::vector<vertex> vertices;
 	std::vector<uint16_t> indices;
 	Material mat;
-	//std::vector<Texture> textures;
+
+	void SetupMesh();
+	
 };
