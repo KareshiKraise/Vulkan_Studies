@@ -54,6 +54,12 @@ struct Mesh {
 	std::vector<uint16_t> indices;
 	Material mat;
 
-	void SetupMesh();
+	VkBuffer vertexBuffer;
+	VkDeviceMemory vertexBufferMemory;
+
+	VkBuffer indexBuffer;
+	VkDeviceMemory indexBufferMemory;
+
+	void SetupMesh(Vulkan_Backend& backend);
 	
 };

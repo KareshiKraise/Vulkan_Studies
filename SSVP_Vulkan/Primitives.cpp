@@ -44,7 +44,6 @@ std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
 	return attributeDescriptions;
 }
 
-
 void Texture::setupTexture(Vulkan_Backend& backend)
 {
 	int texWidth, texHeight, texChannels;
@@ -160,7 +159,47 @@ void Material::CreateMaterial(Vulkan_Backend& backend, VkDescriptorPool descript
 	vkUpdateDescriptorSets(backend.m_device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 }
 
-void Mesh::SetupMesh()
+void Mesh::SetupMesh(Vulkan_Backend& backend)
 {
+	// setup vertex buffer //
+	VkDeviceSize bufferSize = sizeof(vertices[0])*vertices.size();
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+
+	createBuffer(backend ,bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	void *data;
+	vkMapMemory(backend.m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(backend.m_device, stagingBufferMemory);
+	
+	createBuffer(backend, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+
+
+	copyBuffer(backend, stagingBuffer, vertexBuffer, bufferSize, backend.m_commandPool);
+
+	vkDestroyBuffer(backend.m_device, stagingBuffer, nullptr);
+	vkFreeMemory(backend.m_device, stagingBufferMemory, nullptr);
+
+	//---setup index buffer ---//
+
+	bufferSize = sizeof(indices[0]) * indices.size();
+
+	stagingBuffer;
+	 stagingBufferMemory;
+	createBuffer(backend, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	data;
+	vkMapMemory(backend.m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(backend.m_device, stagingBufferMemory);
+
+	createBuffer(backend, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+
+	copyBuffer(backend, stagingBuffer, indexBuffer, bufferSize, backend.m_commandPool);
+
+	vkDestroyBuffer(backend.m_device, stagingBuffer, nullptr);
+	vkFreeMemory(backend.m_device, stagingBufferMemory, nullptr);
 
 }
+
